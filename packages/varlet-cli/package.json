@@ -1,37 +1,7 @@
 {
-  "name": "@varlet/cli",
-  "version": "3.8.7",
-  "description": "cli of varlet",
-  "keywords": [
-    "cli",
-    "varlet"
-  ],
-  "bugs": {
-    "url": "https://github.com/varletjs/varlet/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/varletjs/varlet.git"
-  },
-  "license": "MIT",
-  "author": "haoziqaq <357229046@qq.com>",
-  "type": "module",
-  "main": "./lib/node/index.js",
-  "module": "./lib/node/index.js",
+  "author": "tdx",
   "bin": {
     "varlet-cli": "./lib/node/bin.js"
-  },
-  "files": [
-    "lib",
-    "client.js",
-    "client.d.ts",
-    "template",
-    "site",
-    "tsconfig.json"
-  ],
-  "scripts": {
-    "build": "rimraf ./lib && tsc",
-    "dev": "tsc --watch"
   },
   "dependencies": {
     "@babel/core": "^7.25.2",
@@ -65,6 +35,7 @@
     "vitest": "2.1.1",
     "vue": "3.4.21"
   },
+  "description": "cli of varlet",
   "devDependencies": {
     "@types/babel__core": "^7.20.1",
     "@types/ejs": "^3.1.1",
@@ -79,6 +50,25 @@
     "@varlet/ui": "workspace:*",
     "rimraf": "^5.0.1"
   },
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  },
+  "files": [
+    "lib",
+    "client.js",
+    "client.d.ts",
+    "template",
+    "site",
+    "tsconfig.json"
+  ],
+  "keywords": [
+    "cli",
+    "varlet"
+  ],
+  "license": "MIT",
+  "main": "./lib/node/index.js",
+  "module": "./lib/node/index.js",
+  "name": "@varlet/cli",
   "peerDependencies": {
     "@varlet/icons": "workspace:*",
     "@varlet/touch-emulator": "workspace:*",
@@ -92,7 +82,14 @@
     "vue": "3.4.21",
     "vue-router": "4.2.0"
   },
-  "engines": {
-    "node": "^14.18.0 || >=16.0.0"
-  }
+  "publishConfig": {
+    "registry": "http://192.168.40.250:9003/repository/local-npm/"
+  },
+  "scripts": {
+    "build": "rimraf ./lib && tsc",
+    "dev": "tsc --watch"
+  },
+  "private": false,
+  "type": "module",
+  "version": "14.8.7"
 }

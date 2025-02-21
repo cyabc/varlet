@@ -28,12 +28,29 @@
         </template>
         <template #right>
           <var-button
+            v-if="zbbMenu.length > 1"
+            class="theme-button"
+            text
+            color="transparent"
+            text-color="#fff"
+            @click.stop="
+              showZbbMenu = true
+              showThemeMenu = false
+            "
+          >
+            <var-icon name="account-circle" :size="28" class="palette" />
+            <var-icon name="chevron-down" class="arrow-down" />
+          </var-button>
+          <var-button
             v-if="themes.length > 1"
             class="theme-button"
             text
             color="transparent"
             text-color="#fff"
-            @click.stop="showThemeMenu = true"
+            @click.stop="
+              showThemeMenu = true
+              showZbbMenu = false
+            "
           >
             <var-icon name="palette" :size="28" class="palette" />
             <var-icon name="chevron-down" class="arrow-down" />
@@ -77,11 +94,25 @@
           v-for="t in themes"
           :key="t.value"
           class="mobile-theme-cell"
-          :class="[currentTheme === t.value && 'mobile-theme-cell--active']"
+          :class="[currentMobileTheme === t.value && 'mobile-theme-cell--active']"
           v-ripple
           @click="toggleTheme(t.value)"
         >
           {{ t[language] }}
+        </var-cell>
+      </div>
+    </transition>
+    <transition name="site-menu">
+      <div class="zbbmenu-settings var-elevation--3" v-if="showZbbMenu">
+        <var-cell
+          v-for="t in zbbMenu"
+          :key="t.value"
+          class="mobile-theme-cell"
+          :class="[currentZbb === t.value && 'mobile-theme-cell--active']"
+          v-ripple
+          @click="toggleZbb(t.value)"
+        >
+          {{ t['name'] }}
         </var-cell>
       </div>
     </transition>
@@ -92,7 +123,7 @@
 import { computed, defineComponent, ref, watch, type ComputedRef, type Ref } from 'vue'
 import config from '@config'
 import { getBrowserTheme, getMobileIndex, setTheme, watchLang, watchTheme, type Theme } from '@varlet/cli/client'
-import { pascalCase } from '@varlet/shared'
+import { bigCamelize } from '@varlet/shared'
 import { useRoute } from 'vue-router'
 import { inIframe, isPhone, removeEmpty } from '../utils'
 
@@ -104,13 +135,17 @@ export default defineComponent({
     const showMenu: Ref<boolean> = ref(false)
     const showThemeMenu: Ref<boolean> = ref(false)
     const language: Ref<string> = ref('')
-    const languages: Ref<Record<string, string>> = ref(config?.mobile?.header?.i18n ?? {})
+    const languages: Ref<Record<string, string>> = ref(config?.mobile?.header?.i18n ?? '')
     const themes: Ref<Record<string, any>[]> = ref(config?.mobile?.header?.themes ?? {})
     const nonEmptyLanguages: ComputedRef<Record<string, string>> = computed(() => removeEmpty(languages.value))
     const redirect = config?.mobile?.redirect ?? ''
     const github: Ref<string> = ref(config?.mobile?.header?.github ?? '')
     const darkMode: Ref<string> = ref(config?.mobile?.header?.darkMode ?? '')
     const currentTheme = ref(getBrowserTheme())
+    const currentMobileTheme = ref('red')
+    const showZbbMenu: Ref<boolean> = ref(false)
+    const zbbMenu: Ref<Record<string, any>[]> = ref(config?.mobile?.header?.zbbMenu ?? '')
+    const currentZbb: Ref<string> = ref(window.localStorage.getItem('SeniorEditionFlag') || '0')
 
     const changeLanguage = (lang: string) => {
       language.value = lang
@@ -147,8 +182,8 @@ export default defineComponent({
     watch(
       () => route.path,
       (to: string) => {
-        const componentName = pascalCase(to.slice(1))
-        const redirectName = pascalCase(redirect.slice(1))
+        const componentName = bigCamelize(to.slice(1))
+        const redirectName = bigCamelize(redirect.slice(1))
         bigCamelizeComponentName.value = componentName === redirectName ? '' : componentName
         showBackIcon.value = componentName !== redirectName
       },
@@ -163,15 +198,60 @@ export default defineComponent({
     }
 
     const toggleTheme = (value: Theme) => {
-      setCurrentTheme(value)
-      window.postMessage(getThemeMessage(), '*')
+      currentMobileTheme.value = value
+      // setCurrentTheme(value)
+      // window.postMessage(getThemeMessage(), '*')
+      // window.localStorage.setItem('mobileTheme', currentMobileTheme.value)
+      changeTheme(value)
       showThemeMenu.value = false
 
       if (!isPhone() && inIframe()) {
         ;(window.top as any).postMessage(getThemeMessage(), '*')
       }
     }
-
+    const changeTheme = (value: Theme) => {
+      let color = value
+      let className = document.body.className
+      let arr = className.split(' ')
+      ;['red', 'white', 'black', 'bluew', 'blueb'].forEach((col) => {
+        let index = arr.indexOf(col)
+        if (index != -1) {
+          arr.splice(index, 1)
+        }
+        let bodyIndex = arr.indexOf(`body-${col}`)
+        if (bodyIndex != -1) {
+          arr.splice(bodyIndex, 1)
+        }
+      })
+      if (color) {
+        arr.push(color)
+        arr.push(`body-${color}`)
+      }
+      className = arr.join(' ')
+      className = className.replace(/(^\s+)|(\s+$)/g, '')
+      document.body.className = className
+    }
+    const toggleZbb = (value: string) => {
+      currentZbb.value = value
+      let url = window.location.href
+      let str = url.split('?')[1] || ''
+      const query = str.split('&')
+      const params = {}
+      for (let i = 0; i < query.length; i++) {
+        const [key, value] = query[i].split('=')
+        if (key && value) params[key] = value
+      }
+      params['SeniorEditionFlag'] = value
+      let str2 = Object.keys(params)
+        .map((key) => `${key}=${params[key]}`)
+        .join('&')
+      console.log('str2----', str2)
+      url = url.split('?')[0] + '?' + str2
+      console.log('str2----', url)
+      window.location.href = url
+      window.localStorage.setItem('SeniorEditionFlag', currentZbb.value)
+      window.parent.frames['mobile'].location.reload(true)
+    }
     ;(window as any).toggleTheme = toggleTheme
     setTheme(currentTheme.value)
     window.postMessage(getThemeMessage(), '*')
@@ -179,6 +259,7 @@ export default defineComponent({
     document.body.addEventListener('click', () => {
       showMenu.value = false
       showThemeMenu.value = false
+      showZbbMenu.value = false
     })
 
     watchTheme((theme, from) => {
@@ -201,6 +282,11 @@ export default defineComponent({
       changeLanguage,
       toggleTheme,
       showThemeMenu,
+      showZbbMenu,
+      zbbMenu,
+      currentZbb,
+      toggleZbb,
+      currentMobileTheme,
     }
   },
 })
@@ -234,10 +320,9 @@ body {
 
 .app-type {
   width: 100%;
-  padding: 15px 0;
+  padding: 15px;
   color: var(--site-config-color-sub-text);
   font-size: 14px;
-  min-height: 50px;
 }
 
 header {
@@ -273,12 +358,21 @@ header {
   position: fixed;
   z-index: 200;
   top: 48px;
-  right: 68px;
+  right: 10px;
+  background: var(--site-config-color-bar);
+}
+.zbbmenu-settings {
+  position: fixed;
+  z-index: 200;
+  top: 48px;
+  right: 75px;
   background: var(--site-config-color-bar);
 }
 
 .router-view__block {
-  padding: 55px 15px 15px;
+  padding-top: 55px;
+  padding-bottom: 15px;
+  // padding: 55px 15px 15px;
 }
 
 .mobile-language-cell {
@@ -337,5 +431,13 @@ header {
 
 .app-bar {
   background: var(--site-config-color-app-bar) !important;
+}
+.body-red,
+.body-bluew {
+  background: #ffffff !important;
+}
+.body-black,
+.body-blueb {
+  background: #121212 !important;
 }
 </style>

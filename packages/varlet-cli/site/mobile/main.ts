@@ -7,6 +7,7 @@ import { inIframe, isPhone } from '../utils'
 import App from './App.vue'
 import '@varlet/touch-emulator'
 import '@varlet/ui/es/style'
+import { install } from '@tdx/base-core'
 
 const redirect = config?.mobile?.redirect
 const defaultLanguage = config?.defaultLanguage
@@ -55,4 +56,11 @@ router.beforeEach((to: any) => {
   }
 })
 
-createApp(App).use(router).use(Varlet).mount('#app')
+var app = createApp(App)
+window.$app = app
+
+install(app, { debug: true })
+
+app.config.productionTip = false
+app.config.globalProperties.$app = app
+app.use(router).use(Varlet).mount('#app')

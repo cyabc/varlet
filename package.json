@@ -5,6 +5,7 @@
   "scripts": {
     "bootstrap": "pnpm install && node scripts/bootstrap.mjs",
     "build": "pnpm --dir ./packages/varlet-ui build",
+    "build:cli": "pnpm --dir ./packages/varlet-cli build",
     "build:play": "pnpm --dir ./packages/varlet-ui-playground build",
     "changelog": "varlet-cli changelog",
     "clean": "rimraf ./node_modules ./packages/*/node_modules",
