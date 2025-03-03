@@ -1,21 +1,50 @@
 {
+  "name": "@varlet/cli",
+  "version": "14.8.8",
+  "description": "cli of varlet",
+  "keywords": [
+    "cli",
+    "varlet"
+  ],
+  "bugs": {
+    "url": "https://github.com/varletjs/varlet/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/varletjs/varlet.git"
+  },
+  "license": "MIT",
   "author": "tdx",
+  "type": "module",
+  "main": "./lib/node/index.js",
+  "module": "./lib/node/index.js",
   "bin": {
     "varlet-cli": "./lib/node/bin.js"
+  },
+  "files": [
+    "lib",
+    "client.js",
+    "client.d.ts",
+    "template",
+    "site"
+  ],
+  "scripts": {
+    "build": "rimraf ./lib && tsc",
+    "dev": "tsc --watch"
   },
   "dependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-typescript": "^7.24.7",
     "@inquirer/prompts": "^6.0.1",
     "@varlet/icon-builder": "0.2.14",
-    "@varlet/release": "^0.3.2",
+    "@varlet/release": "^0.3.3",
     "@varlet/shared": "workspace:*",
     "@varlet/vite-plugins": "workspace:*",
-    "@vitejs/plugin-vue": "5.1.4",
-    "@vitejs/plugin-vue-jsx": "4.0.1",
+    "@vitejs/plugin-vue": "5.2.1",
+    "@vitejs/plugin-vue-jsx": "4.1.1",
     "@vue/babel-plugin-jsx": "1.2.5",
-    "@vue/compiler-sfc": "3.5.6",
-    "@vue/runtime-core": "3.5.6",
+    "@vue/compiler-sfc": "3.5.13",
+    "@vue/runtime-core": "3.5.13",
     "chokidar": "^3.5.2",
     "commander": "^8.3.0",
     "ejs": "^3.1.8",
@@ -31,11 +60,10 @@
     "sharp": "0.31.1",
     "tinyexec": "^0.3.0",
     "typescript": "5.3.3",
-    "vite": "5.4.6",
-    "vitest": "2.1.1",
-    "vue": "3.4.21"
+    "vite": "6.1.1",
+    "vitest": "3.0.6",
+    "vue": "3.5.13"
   },
-  "description": "cli of varlet",
   "devDependencies": {
     "@types/babel__core": "^7.20.1",
     "@types/ejs": "^3.1.1",
@@ -50,46 +78,20 @@
     "@varlet/ui": "workspace:*",
     "rimraf": "^5.0.1"
   },
-  "engines": {
-    "node": "^14.18.0 || >=16.0.0"
-  },
-  "files": [
-    "lib",
-    "client.js",
-    "client.d.ts",
-    "template",
-    "site",
-    "tsconfig.json"
-  ],
-  "keywords": [
-    "cli",
-    "varlet"
-  ],
-  "license": "MIT",
-  "main": "./lib/node/index.js",
-  "module": "./lib/node/index.js",
-  "name": "@varlet/cli",
   "peerDependencies": {
     "@varlet/icons": "workspace:*",
     "@varlet/touch-emulator": "workspace:*",
     "@varlet/ui": "workspace:*",
-    "@vitest/coverage-istanbul": "2.0.5",
-    "@vue/runtime-core": "3.4.21",
-    "@vue/test-utils": "2.4.1",
+    "@vitest/coverage-istanbul": "3.0.6",
+    "@vue/runtime-core": "3.5.13",
+    "@vue/test-utils": "2.4.6",
     "clipboard": "^2.0.6",
     "jsdom": "24.1.1",
     "live-server": "^1.2.1",
-    "vue": "3.4.21",
-    "vue-router": "4.2.0"
+    "vue": "3.5.13",
+    "vue-router": "4.5.0"
   },
-  "publishConfig": {
-    "registry": "http://192.168.40.250:9003/repository/local-npm/"
-  },
-  "scripts": {
-    "build": "rimraf ./lib && tsc",
-    "dev": "tsc --watch"
-  },
-  "private": false,
-  "type": "module",
-  "version": "14.8.7"
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  }
 }

@@ -60,5 +60,3 @@ packages/varlet-preset-tailwindcss/lib
 packages/varlet-touch-emulator/iife.js
 
 .eslintcache
-
-packages/varlet-cli/.npmrc
