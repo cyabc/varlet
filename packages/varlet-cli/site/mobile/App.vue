@@ -123,7 +123,7 @@
 import { computed, defineComponent, ref, watch, type ComputedRef, type Ref } from 'vue'
 import config from '@config'
 import { getBrowserTheme, getMobileIndex, setTheme, watchLang, watchTheme, type Theme } from '@varlet/cli/client'
-import { bigCamelize } from '@varlet/shared'
+import { pascalCase } from '@varlet/shared'
 import { useRoute } from 'vue-router'
 import { inIframe, isPhone, removeEmpty } from '../utils'
 
@@ -135,7 +135,7 @@ export default defineComponent({
     const showMenu: Ref<boolean> = ref(false)
     const showThemeMenu: Ref<boolean> = ref(false)
     const language: Ref<string> = ref('')
-    const languages: Ref<Record<string, string>> = ref(config?.mobile?.header?.i18n ?? '')
+    const languages: Ref<Record<string, string>> = ref(config?.mobile?.header?.i18n ?? {})
     const themes: Ref<Record<string, any>[]> = ref(config?.mobile?.header?.themes ?? {})
     const nonEmptyLanguages: ComputedRef<Record<string, string>> = computed(() => removeEmpty(languages.value))
     const redirect = config?.mobile?.redirect ?? ''
@@ -182,8 +182,8 @@ export default defineComponent({
     watch(
       () => route.path,
       (to: string) => {
-        const componentName = bigCamelize(to.slice(1))
-        const redirectName = bigCamelize(redirect.slice(1))
+        const componentName = pascalCase(to.slice(1))
+        const redirectName = pascalCase(redirect.slice(1))
         bigCamelizeComponentName.value = componentName === redirectName ? '' : componentName
         showBackIcon.value = componentName !== redirectName
       },
@@ -361,6 +361,7 @@ header {
   right: 10px;
   background: var(--site-config-color-bar);
 }
+
 .zbbmenu-settings {
   position: fixed;
   z-index: 200;
@@ -432,10 +433,12 @@ header {
 .app-bar {
   background: var(--site-config-color-app-bar) !important;
 }
+
 .body-red,
 .body-bluew {
   background: #ffffff !important;
 }
+
 .body-black,
 .body-blueb {
   background: #121212 !important;
