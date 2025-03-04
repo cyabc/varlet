@@ -33,10 +33,7 @@
             text
             color="transparent"
             text-color="#fff"
-            @click.stop="
-              showZbbMenu = true
-              showThemeMenu = false
-            "
+            @click.stop="handleThemeButtonClick"
           >
             <var-icon name="account-circle" :size="28" class="palette" />
             <var-icon name="chevron-down" class="arrow-down" />
@@ -47,10 +44,7 @@
             text
             color="transparent"
             text-color="#fff"
-            @click.stop="
-              showThemeMenu = true
-              showZbbMenu = false
-            "
+            @click.stop="handleThemeButtonClick"
           >
             <var-icon name="palette" :size="28" class="palette" />
             <var-icon name="chevron-down" class="arrow-down" />
@@ -266,6 +260,11 @@ export default defineComponent({
       from === 'pc' && setCurrentTheme(theme)
     })
 
+    const handleThemeButtonClick = () => {
+      showZbbMenu.value = false
+      showThemeMenu.value = true
+    }
+
     return {
       bigCamelizeComponentName,
       showBackIcon,
@@ -287,6 +286,7 @@ export default defineComponent({
       currentZbb,
       toggleZbb,
       currentMobileTheme,
+      handleThemeButtonClick,
     }
   },
 })
