@@ -11,10 +11,10 @@ export default defineComponent({
 
     const init = () => {
       const { language, menuName } = getPCLocationInfo()
-
+      const langKey = window.localStorage.getItem('langKey') || 'cn'
       if (isPhone() && useMobile.value) {
-        window.location.href = `${getMobileIndex()}#/${menuName}?language=${
-          language || defaultLanguage
+        window.location.href = `${getMobileIndex()}#/${menuName}?language=${language || defaultLanguage}&langKey=${
+          langKey
         }&platform=mobile`
         return
       }

@@ -130,24 +130,33 @@ export default defineComponent({
     const showThemeMenu: Ref<boolean> = ref(false)
     const language: Ref<string> = ref('')
     const languages: Ref<Record<string, string>> = ref(config?.mobile?.header?.i18n ?? {})
+    if (languages.value['en-US']) delete languages.value['en-US']
+    if (languages.value['zh-CN']) delete languages.value['zh-CN']
+
     const themes: Ref<Record<string, any>[]> = ref(config?.mobile?.header?.themes ?? {})
     const nonEmptyLanguages: ComputedRef<Record<string, string>> = computed(() => removeEmpty(languages.value))
     const redirect = config?.mobile?.redirect ?? ''
     const github: Ref<string> = ref(config?.mobile?.header?.github ?? '')
     const darkMode: Ref<string> = ref(config?.mobile?.header?.darkMode ?? '')
     const currentTheme = ref(getBrowserTheme())
-    const currentMobileTheme = ref('red')
+    const currentMobileTheme = ref(window.localStorage.getItem('color') || 'red')
     const showZbbMenu: Ref<boolean> = ref(false)
     const zbbMenu: Ref<Record<string, any>[]> = ref(config?.mobile?.header?.zbbMenu ?? '')
     const currentZbb: Ref<string> = ref(window.localStorage.getItem('SeniorEditionFlag') || '0')
-
+    const currentMobileLanguage = ref(window.localStorage.getItem('langKey') || 'zh-Hans')
+    const showLanguageMenu = ref(false)
     const changeLanguage = (lang: string) => {
       language.value = lang
       showMenu.value = false
-      window.location.href = `${getMobileIndex()}#${route.path}?language=${language.value}&replace=${
+      window.location.href = `${getMobileIndex()}#${route.path}?color=${currentMobileTheme.value}&language=${language.value}&langKey=${language.value}&replace=${
         route.query.replace
       }`
-
+      window.localStorage.setItem('langKey', language.value)
+      if (!isPhone() && inIframe()) {
+        window.parent.frames[0].location.reload(true)
+      } else {
+        window.location.reload(true)
+      }
       if (!isPhone() && inIframe()) {
         ;(window.top as any).scrollToMenu(redirect.slice(1))
       }
@@ -224,6 +233,10 @@ export default defineComponent({
       className = arr.join(' ')
       className = className.replace(/(^\s+)|(\s+$)/g, '')
       document.body.className = className
+      window.localStorage.setItem('color', color)
+      window.location.href = `${getMobileIndex()}#${route.path}?color=${color}&language=${language.value}&langKey=${language.value}&replace=${
+        route.query.replace
+      }`
     }
     const toggleZbb = (value: string) => {
       currentZbb.value = value
@@ -245,6 +258,14 @@ export default defineComponent({
       window.location.href = url
       window.localStorage.setItem('SeniorEditionFlag', currentZbb.value)
       window.parent.frames['mobile'].location.reload(true)
+    }
+    const toggleLanguage = (value: string) => {
+      currentMobileLanguage.value = value
+      showLanguageMenu.value = false
+
+      // if (!isPhone() && inIframe()) {
+      //   ;(window.top as any).postMessage(getThemeMessage(), '*')
+      // }
     }
     ;(window as any).toggleTheme = toggleTheme
     setTheme(currentTheme.value)
@@ -286,7 +307,8 @@ export default defineComponent({
       currentZbb,
       toggleZbb,
       currentMobileTheme,
-      handleThemeButtonClick,
+      toggleLanguage,
+      currentMobileLanguage,
     }
   },
 })
@@ -358,7 +380,7 @@ header {
   position: fixed;
   z-index: 200;
   top: 48px;
-  right: 10px;
+  right: 75px;
   background: var(--site-config-color-bar);
 }
 
@@ -366,7 +388,7 @@ header {
   position: fixed;
   z-index: 200;
   top: 48px;
-  right: 75px;
+  right: 130px;
   background: var(--site-config-color-bar);
 }
 

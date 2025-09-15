@@ -3,15 +3,17 @@
     <div class="varlet-site-mobile-content">
       <iframe
         id="mobile"
-        :src="`${getMobileIndex()}#/${componentName}?language=${language}&platform=pc&replace=${replace}${
+        name="mobile"
+        :src="`${getMobileIndex()}#/${componentName}?color=${color}&language=${language1}&platform=pc&replace=${replace}${
           hash ? `#${hash}` : ''
-        }`"
+        }&SeniorEditionFlag=${SeniorEditionFlag}`"
       ></iframe>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { computed, ref } from 'vue'
 import { getMobileIndex } from '@varlet/cli/client'
 
 export default {
@@ -30,9 +32,19 @@ export default {
       type: String,
     },
   },
-  setup() {
+  setup(props) {
+    const SeniorEditionFlag = ref(window.localStorage.getItem('SeniorEditionFlag') || '0')
+    const color = computed(() => {
+      return window.localStorage.getItem('color') || 'red' // 示例默认值
+    })
+    const language1 = computed((): string => {
+      return window.localStorage.getItem('language') || props.language || 'zh-Hans' // 示例默认值
+    })
     return {
       getMobileIndex,
+      SeniorEditionFlag,
+      language1,
+      color,
     }
   },
 }
