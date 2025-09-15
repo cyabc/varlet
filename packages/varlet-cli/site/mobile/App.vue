@@ -309,6 +309,7 @@ export default defineComponent({
       currentMobileTheme,
       toggleLanguage,
       currentMobileLanguage,
+      handleThemeButtonClick,
     }
   },
 })
