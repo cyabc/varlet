@@ -4,7 +4,7 @@
       <iframe
         id="mobile"
         name="mobile"
-        :src="`${getMobileIndex()}#/${componentName}?color=${color}&language=${language1}&platform=pc&replace=${replace}${
+        :src="`${getMobileIndex()}#/${componentName}?color=${color}&language=${language1}&langKey=${language1}&platform=pc&replace=${replace}${
           hash ? `#${hash}` : ''
         }&SeniorEditionFlag=${SeniorEditionFlag}`"
       ></iframe>
