@@ -33,7 +33,7 @@
             text
             color="transparent"
             text-color="#fff"
-            @click.stop="handleThemeButtonClick"
+            @click.stop="handleZbbButtonClick"
           >
             <var-icon name="account-circle" :size="28" class="palette" />
             <var-icon name="chevron-down" class="arrow-down" />
@@ -55,7 +55,7 @@
             text
             color="transparent"
             text-color="#fff"
-            @click.stop="showMenu = true"
+            @click.stop="handleLanguageButtonClick"
           >
             <var-icon name="translate" class="i18n" />
             <var-icon name="chevron-down" class="arrow-down" />
@@ -146,25 +146,47 @@ export default defineComponent({
     const currentMobileLanguage = ref(window.localStorage.getItem('langKey') || 'zh-Hans')
     const showLanguageMenu = ref(false)
     const changeLanguage = (lang: string) => {
+      // 更新语言值
       language.value = lang
+      // 关闭菜单
       showMenu.value = false
-      window.location.href = `${getMobileIndex()}#${route.path}?color=${currentMobileTheme.value}&language=${language.value}&langKey=${language.value}&replace=${
-        route.query.replace
-      }`
+
+      // 构建新的URL参数
+      const urlParams = new URLSearchParams({
+        color: currentMobileTheme.value,
+        language: language.value,
+        langKey: language.value,
+        replace: route.query.replace as string,
+      })
+
+      // 更新URL
+      window.location.href = `${getMobileIndex()}#${route.path}?${urlParams.toString()}`
+
+      // 保存语言设置到本地存储
       window.localStorage.setItem('langKey', language.value)
+      // // 处理iframe场景的刷新
       if (!isPhone() && inIframe()) {
-        window.parent.frames[0].location.reload(true)
+        // 刷新iframe
+        window.parent.frames['mobile'].location.reload(true) // 滚动到指定菜单位置
+        window.top?.scrollToMenu?.(redirect.slice(1))
       } else {
         window.location.reload(true)
-      }
-      if (!isPhone() && inIframe()) {
-        ;(window.top as any).scrollToMenu(redirect.slice(1))
       }
     }
 
     const back = () => {
-      window.location.href = `${getMobileIndex()}#${redirect}?language=${language.value}&replace=${redirect.slice(1)}`
+      // 构建返回链接的URL参数
+      const urlParams = new URLSearchParams({
+        language: language.value,
+        langKey: language.value,
+        replace: redirect.slice(1),
+        color: window.localStorage.getItem('color') || 'red',
+      })
 
+      // 更新页面URL
+      window.location.href = `${getMobileIndex()}#${redirect}?${urlParams.toString()}`
+
+      // 非手机且在iframe中时,需要滚动到指定菜单位置
       if (!isPhone() && inIframe()) {
         ;(window.top as any).scrollToMenu(redirect.slice(1))
       }
@@ -213,50 +235,61 @@ export default defineComponent({
       }
     }
     const changeTheme = (value: Theme) => {
-      let color = value
-      let className = document.body.className
-      let arr = className.split(' ')
-      ;['red', 'white', 'black', 'bluew', 'blueb'].forEach((col) => {
-        let index = arr.indexOf(col)
-        if (index != -1) {
-          arr.splice(index, 1)
-        }
-        let bodyIndex = arr.indexOf(`body-${col}`)
-        if (bodyIndex != -1) {
-          arr.splice(bodyIndex, 1)
-        }
+      // 主题颜色列表
+      const themeColors = ['red', 'white', 'black', 'bluew', 'blueb']
+
+      // 获取并处理body的class
+      const bodyClasses = new Set(document.body.className.split(' '))
+
+      // 移除旧的主题相关class
+      themeColors.forEach((color) => {
+        bodyClasses.delete(color)
+        bodyClasses.delete(`body-${color}`)
       })
-      if (color) {
-        arr.push(color)
-        arr.push(`body-${color}`)
+
+      // 添加新的主题class
+      if (value) {
+        bodyClasses.add(value)
+        bodyClasses.add(`body-${value}`)
       }
-      className = arr.join(' ')
-      className = className.replace(/(^\s+)|(\s+$)/g, '')
-      document.body.className = className
-      window.localStorage.setItem('color', color)
-      window.location.href = `${getMobileIndex()}#${route.path}?color=${color}&language=${language.value}&langKey=${language.value}&replace=${
-        route.query.replace
-      }`
+
+      // 更新body class
+      document.body.className = Array.from(bodyClasses).join(' ').trim()
+
+      // 保存主题设置
+      window.localStorage.setItem('color', value)
+
+      // 构建新的URL并跳转
+      const params = new URLSearchParams({
+        color: value,
+        language: language.value,
+        langKey: language.value,
+        replace: route.query.replace as string,
+      })
+
+      window.location.href = `${getMobileIndex()}#${route.path}?${params.toString()}`
+      // 刷新iframe
+      window.parent.frames['mobile'].location.reload(true)
     }
     const toggleZbb = (value: string) => {
+      // 更新当前选中的值
       currentZbb.value = value
-      let url = window.location.href
-      let str = url.split('?')[1] || ''
-      const query = str.split('&')
-      const params = {}
-      for (let i = 0; i < query.length; i++) {
-        const [key, value] = query[i].split('=')
-        if (key && value) params[key] = value
-      }
-      params['SeniorEditionFlag'] = value
-      let str2 = Object.keys(params)
-        .map((key) => `${key}=${params[key]}`)
-        .join('&')
-      console.log('str2----', str2)
-      url = url.split('?')[0] + '?' + str2
-      console.log('str2----', url)
-      window.location.href = url
-      window.localStorage.setItem('SeniorEditionFlag', currentZbb.value)
+
+      // 解析当前URL参数
+      const url = new URL(window.location.href)
+      const searchParams = new URLSearchParams(url.search)
+
+      // 设置新的参数
+      searchParams.set('SeniorEditionFlag', value)
+
+      // 构建新的URL
+      const newUrl = `${url.origin}${url.pathname}?${searchParams.toString()}`
+
+      // 更新URL并保存到localStorage
+      window.location.href = newUrl
+      window.localStorage.setItem('SeniorEditionFlag', value)
+
+      // 刷新iframe
       window.parent.frames['mobile'].location.reload(true)
     }
     const toggleLanguage = (value: string) => {
@@ -284,6 +317,19 @@ export default defineComponent({
     const handleThemeButtonClick = () => {
       showZbbMenu.value = false
       showThemeMenu.value = true
+      showMenu.value = false
+    }
+
+    const handleZbbButtonClick = () => {
+      showZbbMenu.value = true
+      showThemeMenu.value = false
+      showMenu.value = false
+    }
+
+    const handleLanguageButtonClick = () => {
+      showZbbMenu.value = false
+      showThemeMenu.value = false
+      showMenu.value = true
     }
 
     return {
@@ -310,6 +356,8 @@ export default defineComponent({
       toggleLanguage,
       currentMobileLanguage,
       handleThemeButtonClick,
+      handleZbbButtonClick,
+      handleLanguageButtonClick,
     }
   },
 })
