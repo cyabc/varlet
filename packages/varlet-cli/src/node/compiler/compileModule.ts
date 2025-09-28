@@ -8,11 +8,11 @@ import {
   DOCS_DIR_NAME,
   ES_DIR,
   EXAMPLE_DIR_NAME,
-  LIB_DIR,
+  // LIB_DIR,
   SRC_DIR,
   STYLE_DIR_NAME,
   TESTS_DIR_NAME,
-  UMD_DIR,
+  // UMD_DIR,
 } from '../shared/constant.js'
 import { getPublicDirs, isDir, isDTS, isLess, isScript, isScss, isSFC } from '../shared/fsUtils.js'
 import { compileESEntry, compileScriptFile, getScriptExtname } from './compileScript.js'
@@ -34,22 +34,22 @@ export async function compileBundle() {
       emptyOutDir: false,
       removeEnv: true,
     },
-    {
-      format: 'cjs',
-      fileName: `${name}.cjs.js`,
-      cssFileName: name,
-      output: LIB_DIR,
-      emptyOutDir: false,
-      removeEnv: false,
-    },
-    {
-      format: 'umd',
-      fileName: `${name}.js`,
-      cssFileName: name,
-      output: UMD_DIR,
-      emptyOutDir: true,
-      removeEnv: true,
-    },
+    // {
+    //   format: 'cjs',
+    //   fileName: `${name}.cjs.js`,
+    //   cssFileName: name,
+    //   output: LIB_DIR,
+    //   emptyOutDir: false,
+    //   removeEnv: false,
+    // },
+    // {
+    //   format: 'umd',
+    //   fileName: `${name}.js`,
+    //   cssFileName: name,
+    //   output: UMD_DIR,
+    //   emptyOutDir: true,
+    //   removeEnv: true,
+    // },
   ]
   const tasks = buildOptions.map((options) => build(getBundleConfig(varletConfig, options)))
 
